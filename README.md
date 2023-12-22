@@ -72,14 +72,6 @@ In `src/config.json`:
 }
 ```
 
-##### `sources` field list:
-
-- `protocol`
-- `url`
-- `port`
-- `path`
-- `headers`
-
 #### Faking Stats
 
 Use this command to fake stats to `graphite`:
