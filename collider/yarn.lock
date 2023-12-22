@@ -47,6 +47,16 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
+"@types/graphite@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@types/graphite/-/graphite-0.1.2.tgz#9b414b1f70288af2348559345b5b54a2ef1a7960"
+  integrity sha512-k+esqcUwtDaAZbTXf6J06Z82ZNbndJohxh9/PqvtWwYtqJZxSzpD7HBR7oN5ADXGE67MbqDCs1+1/TpJxIz2zQ==
+
+"@types/node-cron@^3.0.11":
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/@types/node-cron/-/node-cron-3.0.11.tgz#70b7131f65038ae63cfe841354c8aba363632344"
+  integrity sha512-0ikrnug3/IyneSHqCBeslAhlK2aBfYek1fGo4bP4QnZPmiqSGRK+Oy7ZMisLWkesffJvQ1cqAcBnJC+8+nxIAg==
+
 acorn-walk@^8.1.1:
   version "8.3.1"
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-8.3.1.tgz#2f10f5b69329d90ae18c58bf1fa8fccd8b959a43"

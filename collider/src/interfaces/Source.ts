@@ -7,3 +7,5 @@ interface Source {
     headers?: object,
   }
 }
+
+export default Source;

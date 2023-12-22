@@ -1,36 +1,52 @@
-import cfg from './config.json';
+import axios from 'axios';
 import cron from 'node-cron';
+import graphite from 'graphite';
+
+import cfg from './config.json';
 import Destination from './interfaces/Destination';
 import Source from './interfaces/Source';
 
-const config = {
-  destination: {
-    protocol: cfg.destination.protocol,
-    url: cfg.destination.url,
-    port: cfg.destination.port ?? 2003,
-  },
-};
-
-Object.keys(cfg.sources).forEach((source) => {
-  config.sources[source] = cfg.sources[source];
-});
-
 class Collider {
-  async sendToGraphite(destination: Destination, source: Source) {
+  config = {
+    destination: {
+      protocol: cfg.destination.protocol,
+      url: cfg.destination.url,
+      port: cfg.destination.port ?? 2003,
+    },
+    sources: { ...cfg.sources },
+  };
+  
+  async sendToGraphite(destination: Destination, source: Source, prefix: string) {
     const d = destination;
-    const port = d.port ? `:${d.port}` : '';
+    const dPort = d.port ? `:${d.port}` : '';
+    const dPath = d.path ? `/${d.path}` : '';
+    const dUri = `${d.protocol}://${d.url}${dPort}${dPath}`;
+    console.log(`graphite dest: ${dUri}`);
+    const graphiteClient = graphite.createClient(dUri);
+
+    const s = source;
+    const sPort = s.port ? `:${s.port}` : '';
+    const sPath = s.path ? `${s.path}` : '';
+    const sUri = `${s.protocol}://${s.url}${sPort}/${sPath}`
     try {
-      const response = await axios.get(`${d.protocol}://${d.url}${port}`);
-      const data = response.data;
-      
-      if (data) {
-        source.metrics.forEach((metric) => {
+      console.log(`querying: ${sUri}\nwith headers: ${JSON.stringify(source.headers, null, 2)}`);
+      // @ts-expect-error TS2322
+      const response = await axios.get(sUri, { headers: { ...source.headers } });
+      if (response.status == 200) {
+        const data = response.data;
+        console.log(`  data returned: ${JSON.stringify(data, null, 2)}`);
+        
+        Object.keys(source.metrics).forEach((metricKey) => {
+          // @ts-expect-error TS7053
+          const metric = source.metrics[metricKey];
           const datum = this.getDatumByPath(data, metric);
-          const sourceName = Object.keys(source)[0]
-          graphiteClient.write({ `${sourceName}.${metric}`: datum });
+          console.log(`    logging: ${prefix}.${metric}=${datum}`);
+          const graphiteMetric = { [`${prefix}.${metric}`]: datum };
+          graphiteClient.write(graphiteMetric);
         });
       }
     } catch (error) {
+      // @ts-expect-error TS18046
       console.error('Error fetching or logging data:', error.message);
     }
   }
@@ -41,8 +57,12 @@ class Collider {
   }
   
   start() {
-    config.sources.forEach((source) => {
-      cron.schedule(source.cron, await sendToGraphite(config.destination, source));
+    Object.keys(this.config.sources).forEach((sourceKey) => {
+      // @ts-expect-error TS7053
+      const source = this.config.sources[sourceKey];
+      cron.schedule(source.cron, () => {
+        this.sendToGraphite(this.config.destination, source, sourceKey)
+      });
     });
   }
 }

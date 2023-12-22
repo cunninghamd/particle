@@ -2,7 +2,26 @@
   "destination": {
     "protocol": "plaintext",
     "url": "localhost",
-    "port": "2003"
+    "port": "2003",
+    "path": null
   },
-  "sources": []
+  "sources": {
+    "prusa": {
+      "cron": "0,10,20,30,40,50 * * * * *",
+      "protocol": "http",
+      "url": "prusa.local",
+      "port": null,
+      "path": "api/printer",
+      "headers": {
+        "X-Api-Key": "97E54B22AE174C85BEA765A4CD926ADB"
+      },
+      "metrics": [
+        "sd.ready",
+        "temperature.bed.actual",
+        "temperature.bed.target",
+        "temperature.tool0.actual",
+        "temperature.tool0.target"
+      ]
+    }
+  }
 }

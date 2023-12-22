@@ -51,11 +51,13 @@ In `src/config.json`:
 - update the `destination` object as needed.
 - add `sources`, for example, to add a Prusa 3D printer running `OctoPrint`, sources would be:
 ```
-"sources: [
+"sources: {
   "prusa": {
     "cron": "* * * * *",
     "protocol": "http",
     "url": "prusa.local",
+    "port": null,
+    "path": "api/printer",
     "headers": {
       "X-Api-Key": "<octoprint-api-key>"
     },
@@ -67,7 +69,7 @@ In `src/config.json`:
       "temperature.tool0.target"
     ]
   }
-]
+}
 ```
 
 ##### `sources` field list:
@@ -75,6 +77,7 @@ In `src/config.json`:
 - `protocol`
 - `url`
 - `port`
+- `path`
 - `headers`
 
 #### Faking Stats
