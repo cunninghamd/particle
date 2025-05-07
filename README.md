@@ -14,6 +14,7 @@ tools used are likely to include:
 
 - grafana
 - graphite
+- prometheus
 
 ## Getting Started
 
@@ -25,13 +26,15 @@ Then use the following URLs:
 
 - http://localhost:3000 - grafana
 - http://localhost:8080 - graphite
+- http://localhost:9090 - prometheus
 
 ### Notes
 
 - when configuring `grafana` to access `graphite`, keep in mind that you need to reference the docker hostname that's created.
     - grafana: particle-grafana-1
     - graphite: particle-graphite-1
-    
+    - prometheus: particle-prometheus-1
+
 ## Services, a.k.a. Getting Data
 
 ### collider
@@ -44,7 +47,7 @@ TODO: footnote
 
 In this case, `collider` retrieves data from a `source`, and pushes it to `graphite` for display within `grafana`.
 
-#### configuring services
+### configuring services (via collider/nodejs)
 
 In `src/config.json`:
 
@@ -70,6 +73,16 @@ In `src/config.json`:
     ]
   }
 }
+```
+
+### configuring services (via prometheus)
+
+```
+# prometheus.yml
+scrape_configs:
+  - job_name: 'esp8266'
+    static_configs:
+      - targets: ['192.168.1.100:8080'] # ESP8266 IP and port
 ```
 
 #### Faking Stats

@@ -1,7 +1,14 @@
 global:
   scrape_interval: 10s
+
 scrape_configs:
+  # Self-Monitoring
   - job_name: prometheus
     static_configs:
       - targets:
           - prometheus:9090
+
+  # Sensors
+  - job_name: "sensors"
+    file_sd_configs:
+      - files: ["targets/sensors/*.yaml"]
