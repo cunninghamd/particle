@@ -18,6 +18,7 @@ services:
   prometheus:
     image: prom/prometheus
     restart: always
+    network_mode: host
     volumes:
       - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "./prometheus/targets:/etc/prometheus/targets"
