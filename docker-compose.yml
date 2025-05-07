@@ -20,6 +20,7 @@ services:
     restart: always
     volumes:
       - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus/targets:/etc/prometheus/targets"
     ports:
       - 9090:9090
   # glances:
