@@ -1,18 +1,26 @@
-version: '3'
 services:
   grafana:
     image: grafana/grafana-oss
+    restart: always
     ports:
       - 3000:3000
     volumes:
       - grafana-storage:/var/lib/grafana
   graphite:
     image: graphiteapp/graphite-statsd
+    restart: always
     ports:
       - 8080:80
       - 2003-2004:2003-2004
       - 2023-2024:2023-2024
       - 8125:8125/udp
       - 8126:8126
+  # glances:
+  #   build: ./glances
+  #   restart: always
+  #   environment:
+  #     - GLANCES_OPT=--export graphite
+  #   ports:
+  #     - 61208-61209:61208-61209
 volumes:
   grafana-storage:
