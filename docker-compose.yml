@@ -15,6 +15,13 @@ services:
       - 2023-2024:2023-2024
       - 8125:8125/udp
       - 8126:8126
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports:
+      - 9090:9090
   # glances:
   #   build: ./glances
   #   restart: always
