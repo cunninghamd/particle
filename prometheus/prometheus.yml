@@ -11,4 +11,4 @@ scrape_configs:
   # Sensors
   - job_name: "sensors"
     file_sd_configs:
-      - files: ["/etc/prometheus/targets/sensors/*.yaml"]
+      - files: ["/etc/prometheus/targets/sensors/*.yml"]
