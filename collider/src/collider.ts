@@ -1,10 +1,11 @@
-import axios from 'axios';
-import cron from 'node-cron';
-import graphite from 'graphite';
+import axios from "axios";
+import AxiosDigestAuth from "@mhoc/axios-digest-auth";
+import cron from "node-cron";
+import graphite from "graphite";
 
-import cfg from './config.json';
-import Destination from './interfaces/Destination';
-import Source from './interfaces/Source';
+import cfg from "./config.json";
+import Destination from "./interfaces/Destination";
+import Source from "./interfaces/Source";
 
 class Collider {
   config = {
@@ -15,27 +16,47 @@ class Collider {
     },
     sources: { ...cfg.sources },
   };
-  
-  async sendToGraphite(destination: Destination, source: Source, prefix: string) {
+
+  async sendToGraphite(
+    destination: Destination,
+    source: Source,
+    prefix: string,
+  ) {
     const d = destination;
-    const dPort = d.port ? `:${d.port}` : '';
-    const dPath = d.path ? `/${d.path}` : '';
+    const dPort = d.port ? `:${d.port}` : "";
+    const dPath = d.path ? `/${d.path}` : "";
     const dUri = `${d.protocol}://${d.url}${dPort}${dPath}`;
     console.log(`graphite dest: ${dUri}`);
     const graphiteClient = graphite.createClient(dUri);
 
     const s = source;
-    const sPort = s.port ? `:${s.port}` : '';
-    const sPath = s.path ? `${s.path}` : '';
-    const sUri = `${s.protocol}://${s.url}${sPort}/${sPath}`
+    const sPort = s.port ? `:${s.port}` : "";
+    const sPath = s.path ? `${s.path}` : "";
+    const sUri = `${s.protocol}://${s.url}${sPort}/${sPath}`;
     try {
-      console.log(`querying: ${sUri}\nwith headers: ${JSON.stringify(source.headers, null, 2)}`);
-      // @ts-expect-error TS2322
-      const response = await axios.get(sUri, { headers: { ...source.headers } });
+      console.log(
+        `querying: ${sUri}\nwith headers: ${JSON.stringify(source.headers, null, 2)}`,
+      );
+      let response: any;
+      if (source.digestAuth) {
+        const digestAuth = new AxiosDigestAuth({
+          username: source.digestAuth.username,
+          password: source.digestAuth.password,
+        });
+        response = await digestAuth.request({
+          headers: { ...source.headers },
+          method: "GET",
+          url: sUri,
+        });
+      } else {
+        response = await axios.get(sUri, {
+          headers: { ...source.headers },
+        });
+      }
       if (response.status == 200) {
         const data = response.data;
         console.log(`  data returned: ${JSON.stringify(data, null, 2)}`);
-        
+
         Object.keys(source.metrics).forEach((metricKey) => {
           // @ts-expect-error TS7053
           const metric = source.metrics[metricKey];
@@ -47,21 +68,23 @@ class Collider {
       }
     } catch (error) {
       // @ts-expect-error TS18046
-      console.error('Error fetching or logging data:', error.message);
+      console.error("Error fetching or logging data:", error.message);
     }
   }
-  
+
   getDatumByPath(obj: Record<string, any>, path: string): any {
-    const keys = path.split('.');
-    return keys.reduce((acc, key) => (acc && acc[key] ? acc[key] : undefined), obj);
+    const keys = path.split(".");
+    return keys.reduce(
+      (acc, key) => (acc && acc[key] ? acc[key] : undefined),
+      obj,
+    );
   }
-  
+
   start() {
     Object.keys(this.config.sources).forEach((sourceKey) => {
-      // @ts-expect-error TS7053
       const source = this.config.sources[sourceKey];
       cron.schedule(source.cron, () => {
-        this.sendToGraphite(this.config.destination, source, sourceKey)
+        this.sendToGraphite(this.config.destination, source, sourceKey);
       });
     });
   }

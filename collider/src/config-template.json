@@ -1,0 +1,63 @@
+{
+  "destination": {
+    "protocol": "plaintext",
+    "url": "localhost",
+    "port": "2003",
+    "path": null
+  },
+  "sources": {
+    "octoprint": {
+      "cron": "*/10 * * * * *",
+      "protocol": "http",
+      "url": "octoprint.local",
+      "port": null,
+      "path": "api/printer",
+      "headers": {
+        "X-Api-Key": "XXXXXXXXXX"
+      },
+      "metrics": [
+        "sd.ready",
+        "temperature.bed.actual",
+        "temperature.bed.target",
+        "temperature.tool0.actual",
+        "temperature.tool0.target"
+      ]
+    },
+    "prusa-link-1": {
+      "cron": "*/10 * * * * *",
+      "protocol": "http",
+      "url": "octoprint.local",
+      "port": null,
+      "path": "api/printer",
+      "digestAuth": {
+        "username": "user",
+        "password": "pass"
+      },
+      "metrics": [
+        "telemetry.temp-bed",
+        "telemetry.temp-nozzle",
+        "telemetry.print-speed",
+        "telemetry.z-height",
+        "telemetry.material",
+        "temperature.tool0.actual",
+        "temperature.tool0.target",
+        "temperature.tool0.display",
+        "temperature.tool0.offset",
+        "temperature.bed.actual",
+        "temperature.bed.target",
+        "temperature.bed.offset",
+        "state.text",
+        "state.flags.operational",
+        "state.flags.paused",
+        "state.flags.printing",
+        "state.flags.cancelling",
+        "state.flags.pausing",
+        "state.flags.error",
+        "state.flags.sdReady",
+        "state.flags.closedOnError",
+        "state.flags.ready",
+        "state.flags.busy"
+      ]
+    }
+  }
+}

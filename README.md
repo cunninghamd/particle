@@ -49,16 +49,16 @@ In this case, `collider` retrieves data from a `source`, and pushes it to `graph
 
 ### configuring services (via collider/nodejs)
 
-In `src/config.json`:
+Copy `src/config-template.json` to `src/config.json`:
 
 - update the `destination` object as needed.
-- add `sources`, for example, to add a Prusa 3D printer running `OctoPrint`, sources would be:
+- add `sources`, for example, to add a 3D printer running `OctoPrint`, sources would be:
 ```
 "sources: {
-  "prusa": {
+  "octoprint": {
     "cron": "* * * * *",
     "protocol": "http",
-    "url": "prusa.local",
+    "url": "octoprint.local",
     "port": null,
     "path": "api/printer",
     "headers": {
