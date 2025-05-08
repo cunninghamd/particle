@@ -5,4 +5,4 @@ prometheus/targets/**/*.yaml
 
 secrets.h
 
-collider/source/config.json
+collider/src/config.json

@@ -39,17 +39,28 @@ class Collider {
       );
       let response: any;
       if (source.digestAuth) {
+        console.log(
+          `querying: with digestAuth: ${JSON.stringify(source.digestAuth, null, 2)}`,
+        );
         const digestAuth = new AxiosDigestAuth({
+          // @ts-expect-error TS2322
           username: source.digestAuth.username,
+          // @ts-expect-error TS2322
           password: source.digestAuth.password,
         });
         response = await digestAuth.request({
-          headers: { ...source.headers },
+          // @ts-expect-error TS2322
+          headers: {
+            Accept: "application/json",
+            ...source.headers,
+          },
           method: "GET",
           url: sUri,
         });
+        console.log("response: %o", response);
       } else {
         response = await axios.get(sUri, {
+          // @ts-expect-error TS2322
           headers: { ...source.headers },
         });
       }
@@ -69,6 +80,7 @@ class Collider {
     } catch (error) {
       // @ts-expect-error TS18046
       console.error("Error fetching or logging data:", error.message);
+      console.error(error);
     }
   }
 
@@ -82,6 +94,7 @@ class Collider {
 
   start() {
     Object.keys(this.config.sources).forEach((sourceKey) => {
+      // @ts-expect-error TS7053
       const source = this.config.sources[sourceKey];
       cron.schedule(source.cron, () => {
         this.sendToGraphite(this.config.destination, source, sourceKey);

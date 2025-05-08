@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "Derek Cunningham",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node src/main.ts"
+  },
   "dependencies": {
     "@mhoc/axios-digest-auth": "^0.8.0",
     "axios": "^1.6.2",
