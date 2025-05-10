@@ -1,0 +1,39 @@
+{
+  "sources": {
+    "prusa-link-1": {
+      "cron": "*/10 * * * * *",
+      "protocol": "http",
+      "url": "prusa-link",
+      "port": null,
+      "path": "api/printer",
+      "headers": {
+        "X-Api-Key": "XXXXXXXXXX"
+      },
+      "metrics": [
+        "telemetry.temp-bed",
+        "telemetry.temp-nozzle",
+        "telemetry.print-speed",
+        "telemetry.z-height",
+        "telemetry.material",
+        "temperature.tool0.actual",
+        "temperature.tool0.target",
+        "temperature.tool0.display",
+        "temperature.tool0.offset",
+        "temperature.bed.actual",
+        "temperature.bed.target",
+        "temperature.bed.offset",
+        "state.text",
+        "state.flags.operational",
+        "state.flags.paused",
+        "state.flags.printing",
+        "state.flags.cancelling",
+        "state.flags.pausing",
+        "state.flags.error",
+        "state.flags.sdReady",
+        "state.flags.closedOnError",
+        "state.flags.ready",
+        "state.flags.busy"
+      ]
+    }
+  }
+}
