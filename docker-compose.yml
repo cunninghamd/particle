@@ -24,6 +24,11 @@ services:
       - "./prometheus/targets:/etc/prometheus/targets"
     ports:
       - 9090:9090
+  prm-exp-prusa:
+    build:
+      context: .
+      dockerfile: prometheus/exporters/prusa/prusa.dockerfile
+    restart: always
   # glances:
   #   build: ./glances
   #   restart: always

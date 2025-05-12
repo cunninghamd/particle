@@ -1,102 +1,106 @@
 import express from "express";
 import fetch from "node-fetch";
-import client from "prom-client";
 
+// @ts-expect-error
 import cfg from "./config.json";
 
 const app = express();
-const register = new client.Registry();
 
-config = {
+const config = {
   sources: { ...cfg.sources },
 };
 
-// Define a metric (adjust the name/description as needed)
-const metricsConfig = [
-  { name: "telemetry_temp_bed", help: "Telemetry: Bed temperature", path: ["telemetry", "temp-bed"] },
-  { name: "telemetry_temp_nozzle", help: "Telemetry: Nozzle temperature", path: ["telemetry", "temp-nozzle"] },
-  { name: "telemetry_print_speed", help: "Telemetry: Print speed", path: ["telemetry", "print-speed"] },
-  { name: "telemetry_z_height", help: "Telemetry: Z height", path: ["telemetry", "z-height"] },
-  { name: "telemetry_material", help: "Telemetry: Material", path: ["telemetry", "material"] },
-  { name: "temperature_tool0_actual", help: "Temperature: Tool 0 actual", path: ["temperature", "tool0", "actual"] },
-  { name: "temperature_tool0_target", help: "Temperature: Tool 0 target", path: ["temperature", "tool0", "target"] },
-  { name: "temperature_tool0_display", help: "Temperature: Tool 0 display", path: ["temperature", "tool0", "display"] },
-  { name: "temperature_tool0_offset", help: "Temperature: Tool 0 offset", path: ["temperature", "tool0", "offset"] },
-  { name: "temperature_bed_actual", help: "Temperature: Bed actual", path: ["temperature", "bed", "actual"] },
-  { name: "temperature_bed_target", help: "Temperature: Bed target", path: ["temperature", "bed", "target"] },
-  { name: "temperature_bed_offset", help: "Temperature: Bed offset", path: ["temperature", "bed", "offset"] },
-  { name: "state_flags_operational", help: "State: flags.operational", path: ["state", "flags", "operational"] },
-  { name: "state_flags_paused", help: "State: flags.paused", path: ["state", "flags", "paused"] },
-  { name: "state_flags_printing", help: "State: flags.printing", path: ["state", "flags", "printing"] },
-  { name: "state_flags_cancelling", help: "State: flags.cancelling", path: ["state", "flags", "cancelling"] },
-  { name: "state_flags_pausing", help: "State: flags.pausing", path: ["state", "flags", "pausing"] },
-  { name: "state_flags_error", help: "State: flags.error", path: ["state", "flags", "error"] },
-  { name: "state_flags_sdReady", help: "State: flags.sdReady", path: ["state", "flags", "sdReady"] },
-  { name: "state_flags_closedOnError", help: "State: flags.closedOnError", path: ["state", "flags", "closedOnError"] },
-  { name: "state_flags_ready", help: "State: flags.ready", path: ["state", "flags", "ready"] },
-  { name: "state_flags_busy", help: "State: flags.busy", path: ["state", "flags", "busy"] }
-];
-// A map from metric names to gauges
-const gauges: Record<string, client.Gauge> = {};
-metricsConfig.forEach(({name, help}) => {
-  const g = new client.Gauge({ name, help });
-  gauges[name] = g;
-  register.registerMetric(g);
-});
-// Add 'state_text' as a label on a gauge, since Prometheus treats strings as labels not metric values
-const stateTextGauge = new client.Gauge({
-  name: "state_text",
-  help: "State text, 1 if present",
-  labelNames: ['value']
-});
-register.registerMetric(stateTextGauge);
-
-// Set default labels and registry
-client.collectDefaultMetrics({ register });
-
-// Periodically fetch data from the external API and update the metric
-const API_URL = "http://example.com/api/stats"; // <-- Replace this!
+const srcMetrics = {};
 
 async function updateMetrics() {
-  try {
-    const response = await fetch(API_URL, {
-      headers: { "X-Api-Key": "owpNnRH9AfmQ6hP" },
+  for (const [source, cfg] of Object.entries(config.sources)) {
+    // @ts-expect-error
+    let { protocol, url, port, path, headers } = cfg;
+    let uri = `${protocol}://${url}`;
+    if (port) {
+      uri += `:${port}`;
+    }
+    if (path) {
+      uri += path.startsWith("/") ? path : "/" + path;
+    }
+    const response = await fetch(uri, {
+      headers: headers || {},
     });
     const data = await response.json();
-    // Set all configured metrics
-    metricsConfig.forEach(({name, path}) => {
-      let val: any = data;
-      for (const p of path) {
-        if (val && typeof val === "object" && p in val) {
-          val = val[p];
-        } else {
-          val = undefined;
-          break;
-        }
-      }
-      const numVal = typeof val === "number" ? val : (typeof val === "boolean" ? (val ? 1 : 0) : 0);
-      gauges[name].set(numVal);
-    });
+    // console.log(data);
 
-    // Special handling for state.text (string)
-    if (data?.state?.text && typeof data.state.text === "string") {
-      stateTextGauge.labels(data.state.text).set(1);
-    }
-  } catch (err) {
-    // reset all gauges to 0 on error
-    for (const g of Object.values(gauges)) {
-      g.set(0);
-    }
-    stateTextGauge.reset();
+    // @ts-expect-error
+    srcMetrics[source] = new Array();
+
+    // @ts-expect-error
+    Object.keys(cfg.metrics).forEach((metricKey) => {
+      // @ts-expect-error TS7053
+      const metric = cfg.metrics[metricKey];
+      // console.log("DATA: %o", data);
+      // console.log("METRIC: %o", metric);
+      const metricParts = metric.split(".");
+      const datum = getDatumByPath(data, metric);
+
+      // group
+      let metricStr = `${metricParts[0]}`;
+      if (metricStr.length > 1) {
+        metricStr += "{";
+      }
+      // type
+      if (metricParts[1] !== undefined) {
+        metricStr += `type="${metricParts[1]}"`;
+      }
+      // name
+      if (metricParts[2] !== undefined) {
+        metricStr += `, name="${metricParts[2]}"`;
+      }
+      // value (if string)
+      if (typeof datum === "string") {
+        metricStr += `, value="${datum}"`;
+      }
+      if (metricStr.length > 1) {
+        metricStr += "}";
+      }
+      if (typeof datum === "string") {
+        metricStr += " 1"; // dummy value for string metrics
+      } else if (typeof datum === "boolean") {
+        metricStr += ` ${datum === true ? 1 : 0}`;
+      } else if (datum !== undefined && datum !== null) {
+        metricStr += ` ${datum.toString()}`;
+      }
+
+      // console.log(metricStr);
+      // @ts-expect-error
+      srcMetrics[source].push(metricStr);
+    });
   }
 }
-setInterval(updateMetrics, 10000); // Every 10 seconds
+
+setInterval(updateMetrics, 5000); // Every 5 seconds
 updateMetrics();
 
-app.get("/metrics", async (_req, res) => {
-  res.set("Content-Type", register.contentType);
-  res.end(await register.metrics());
+function getDatumByPath(obj: Record<string, any>, path: string): any {
+  const keys = path.split(".");
+  return keys.reduce(
+    (acc, key) => (acc !== undefined && acc !== null ? acc[key] : undefined),
+    obj,
+  );
+}
+
+// TODO: return the metrics in each of the app.get scenarios
+app.get("/metrics/:source", async (req, res) => {
+  const { source } = req.params;
+  // @ts-expect-error
+  const promMetrics = srcMetrics[source].join("\n");
+  res.set("Content-Type", "text/plain");
+  res.send(promMetrics);
 });
+
+// app.get("/metrics/:source", async (_req, res) => {
+//   const { source } = req.params;
+//   res.set("Content-Type", register.contentType);
+//   res.end(await register.metrics(source));
+// });
 
 const PORT = 9469;
 app.listen(PORT, () => {
