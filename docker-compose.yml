@@ -30,6 +30,8 @@ services:
       context: ./prometheus/exporters/prusa
       dockerfile: prusa.dockerfile
     restart: always
+    ports:
+      - 10001:10001
   # glances:
   #   build: ./glances
   #   restart: always

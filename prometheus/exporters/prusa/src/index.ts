@@ -102,7 +102,7 @@ app.get("/metrics/:source", async (req, res) => {
 //   res.end(await register.metrics(source));
 // });
 
-const PORT = 9469;
+const PORT = 10001;
 app.listen(PORT, () => {
   console.log(`Prometheus exporter listening on port ${PORT}...`);
 });
