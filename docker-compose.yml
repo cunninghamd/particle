@@ -24,7 +24,8 @@ services:
       - "./prometheus/targets:/etc/prometheus/targets"
     ports:
       - 9090:9090
-  prm-exp-prusa:
+  # prometheus exporters
+  prometheus-xp-prusa:
     build:
       context: ./prometheus/exporters/prusa
       dockerfile: prusa.dockerfile
