@@ -37,33 +37,10 @@ class Collider {
       console.log(
         `querying: ${sUri}\nwith headers: ${JSON.stringify(source.headers, null, 2)}`,
       );
-      let response: any;
-      if (source.digestAuth) {
-        console.log(
-          `querying: with digestAuth: ${JSON.stringify(source.digestAuth, null, 2)}`,
-        );
-        const digestAuth = new AxiosDigestAuth({
-          // @ts-expect-error TS2322
-          username: source.digestAuth.username,
-          // @ts-expect-error TS2322
-          password: source.digestAuth.password,
-        });
-        response = await digestAuth.request({
-          // @ts-expect-error TS2322
-          headers: {
-            Accept: "application/json",
-            ...source.headers,
-          },
-          method: "GET",
-          url: sUri,
-        });
-        console.log("response: %o", response);
-      } else {
-        response = await axios.get(sUri, {
-          // @ts-expect-error TS2322
-          headers: { ...source.headers },
-        });
-      }
+      const response = await axios.get(sUri, {
+        // @ts-expect-error TS2322
+        headers: { ...source.headers },
+      });
       if (response.status == 200) {
         const data = response.data;
         console.log(`  data returned: ${JSON.stringify(data, null, 2)}`);
@@ -87,7 +64,7 @@ class Collider {
   getDatumByPath(obj: Record<string, any>, path: string): any {
     const keys = path.split(".");
     return keys.reduce(
-      (acc, key) => (acc && acc[key] ? acc[key] : undefined),
+      (acc, key) => (acc !== undefined && acc !== null) ? acc[key] : undefined,
       obj,
     );
   }
