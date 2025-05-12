@@ -22,6 +22,7 @@ services:
     volumes:
       - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
       - "./prometheus/targets:/etc/prometheus/targets"
+      - "./prometheus/data:/prometheus"
     ports:
       - 9090:9090
   # prometheus exporters

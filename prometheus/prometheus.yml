@@ -12,3 +12,14 @@ scrape_configs:
   - job_name: "sensors"
     file_sd_configs:
       - files: ["/etc/prometheus/targets/sensors/*.yml"]
+
+  # Prusa 3D Printers
+  - job_name: "prusa-mini-1"
+    metrics_path: /metrics/prusa-mini-1
+    file_sd_configs:
+      - files: ["/etc/prometheus/targets/prusa/prusa-mini-1.yml"]
+
+  - job_name: "prusa-mk4-1"
+    metrics_path: /metrics/prusa-mk4-1
+    file_sd_configs:
+      - files: ["/etc/prometheus/targets/prusa/prusa-mk4-1.yml"]
