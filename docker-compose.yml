@@ -26,8 +26,8 @@ services:
       - 9090:9090
   prm-exp-prusa:
     build:
-      context: prometheus/exporters/prusa
-      dockerfile: prometheus/exporters/prusa/prusa.dockerfile
+      context: ./prometheus/exporters/prusa
+      dockerfile: prusa.dockerfile
     restart: always
   # glances:
   #   build: ./glances
