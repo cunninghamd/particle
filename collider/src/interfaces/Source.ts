@@ -6,10 +6,6 @@ interface Source {
     port?: string;
     path: string;
     headers?: object;
-    digestAuth?: {
-      username: string;
-      password: string;
-    };
     metrics: string[];
   };
 }
