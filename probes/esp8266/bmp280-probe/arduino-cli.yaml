@@ -1,0 +1,24 @@
+board_manager:
+  additional_urls:
+    - https://arduino.esp8266.com/stable/package_esp8266com_index.json
+
+# Default board to use for this project
+# Run: arduino-cli core install esp8266:esp8266
+default_fqbn: esp8266:esp8266:generic
+
+# Default port (update this to match your device)
+default_port: /dev/ttyUSB0
+
+# Libraries required for this project
+# Install with: arduino-cli lib install "Adafruit BMP280 Library" "Adafruit Unified Sensor"
+# Note: arduino-cli doesn't auto-install from this file, but this documents the dependencies
+library:
+  enable_unsafe_install: false
+
+# Required libraries:
+# - Adafruit BMP280 Library (provides Adafruit_BMP280.h)
+# - Adafruit Unified Sensor (dependency of BMP280 library)
+# - Wire (built-in)
+# - SPI (built-in)
+# - ESP8266WiFi (part of ESP8266 core)
+# - ESP8266WebServer (part of ESP8266 core)

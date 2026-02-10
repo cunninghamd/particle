@@ -2,6 +2,7 @@
 
 prometheus/targets/**/*.yml
 prometheus/targets/**/*.yaml
+prometheus/data/*
 
 secrets.h
 
