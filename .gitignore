@@ -2,8 +2,9 @@
 
 prometheus/targets/**/*.yml
 prometheus/targets/**/*.yaml
-prometheus/data/*
 
 secrets.h
 
-**/config.json
+collider/src/config.json
+
+.DS_Store
